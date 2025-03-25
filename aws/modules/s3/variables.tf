@@ -16,9 +16,3 @@ variable "environment" {
     type = string
   
 }
-
-variable "bucket_acl" {
-    default = "private"
-    description = "Access controlled list setting for bucket......"
-  
-}
