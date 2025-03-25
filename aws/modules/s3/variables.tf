@@ -16,3 +16,9 @@ variable "environment" {
     type = string
   
 }
+
+variable "s3_acl" {
+    description = "ACL for the created s3 bucket..."
+    default = "private"
+  
+}
