@@ -40,3 +40,29 @@ variable "os_name" {
     default = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
   
 }
+
+variable "ec2_vpc_id" {
+    description = "VPC ID in which you need to create the EC2"
+    type = string
+  
+}
+
+variable "ec2_subnet_id" {
+    description = "Subnet ID in which you need to deploy the EC2"
+    type = string
+  
+}
+
+variable "iam_instance_profile" {
+    description = "IAM Role Profile for the EC2 instance"
+    type = string
+    default = ""
+  
+}
+
+variable "ebs_volume_size" {
+
+    description = "The size of the volume that needs to be created...."
+    default = 20
+  
+}
