@@ -7,6 +7,7 @@ terraform {
   }
 }
 
+#for creating the main VPC resource
 resource "aws_vpc" "module_vpc" {
   cidr_block = var.vpc_cidr
 
@@ -17,6 +18,7 @@ resource "aws_vpc" "module_vpc" {
   
 }
 
+#creating the public subnets in the main vpcs......
 resource "aws_subnet" "public_subnet" {
   count = length(var.public_subnet_cidr)
   vpc_id = aws_vpc.module_vpc.id
@@ -31,6 +33,8 @@ resource "aws_subnet" "public_subnet" {
   
 }
 
+
+#creating the private subnets in the main vpcs........
 resource "aws_subnet" "private_subnet" {
   count = length(var.private_subnet_cidr)
   vpc_id = aws_vpc.module_vpc.id
@@ -44,6 +48,7 @@ resource "aws_subnet" "private_subnet" {
   
 }
 
+#creating internet gateway for the public subnets
 resource "aws_internet_gateway" "vpc_igw" {
   vpc_id = aws_vpc.module_vpc.id
 
@@ -54,6 +59,7 @@ resource "aws_internet_gateway" "vpc_igw" {
   
 }
 
+#creating route table for the public subnets
 resource "aws_route_table" "public_subnet_route_table" {
   vpc_id = aws_vpc.module_vpc.id
 
@@ -68,6 +74,7 @@ resource "aws_route_table" "public_subnet_route_table" {
   }
 }
 
+#Associating the public subnets in the public route table
 resource "aws_route_table_association" "public_subnet_rt_association" {
   count = length(aws_subnet.public_subnet.*.id)
   subnet_id = aws_subnet.public_subnet[count.index].id
@@ -75,6 +82,8 @@ resource "aws_route_table_association" "public_subnet_rt_association" {
   
 }
 
+
+#creating the Elastic IP for the NAT gateway
 resource "aws_eip" "vpc_eip_natgateway" {
   depends_on = [ aws_internet_gateway.vpc_igw ]
   domain = "vpc"
@@ -85,6 +94,7 @@ resource "aws_eip" "vpc_eip_natgateway" {
   
 }
 
+#creating the NAT gateway in the main vpcs
 resource "aws_nat_gateway" "vpc_nat_gateway" {
   subnet_id = aws_subnet.public_subnet.id
   allocation_id = aws_eip.vpc_eip_natgateway.id
@@ -96,6 +106,7 @@ resource "aws_nat_gateway" "vpc_nat_gateway" {
   
 }
 
+#creating the route table for the private subnets
 resource "aws_route_table" "private_subnet_route_table" {
   vpc_id = aws_vpc.module_vpc.id
   route = {
@@ -109,6 +120,7 @@ resource "aws_route_table" "private_subnet_route_table" {
   }
 }
 
+#Associating the private subnets with private route table
 resource "aws_route_table_association" "private_subnet_rt_association" {
   count = length(aws_subnet.private_subnet.*.id)
   subnet_id = aws_subnet.private_subnet[count.index].id
